@@ -55,18 +55,11 @@ class UsedCarSpider(scrapy.Spider):
             runway = car.css('p i:nth-child(2)::text').extract()[0]
             city = car.css('.city_i a::text').extract()[0]
             price = car.css('.price i:nth-child(1)::text').extract()[0]
-            item['name'] = name[0]
-            item['runway'] = runway[0]
-            item['time'] = time[0]
-            item['city'] = city[0]
-            item['money'] = price[0]
+            item['name'] = name
+            item['runway'] = runway
+            item['time'] = time
+            item['city'] = city
+            item['money'] = price
             item['brand'] = brand
-            href = car.xpath('a').xpath('@href').extract()[0]
-            yield Request(url=href, meta={"item": item}, callback=self.parse_cars_final)
             items.append(item)
         return items
-
-    def parse_cars_final(self, response):
-        self.log('A response from %s just arrived!' % response.url)
-        item = response.meta['item']
-        return item
