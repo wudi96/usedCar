@@ -9,6 +9,10 @@ class UsedCarSpider(scrapy.Spider):
 
     host = "http://www.taoche.com"
 
+    def __init__(self, brandChoose=None, *args, **kwargs):
+        super(UsedCarSpider, self).__init__(*args, **kwargs)
+        self.brandChoose = brandChoose
+
     def start_requests(self):
         url_brand = "http://www.taoche.com/all/"
         yield Request(url=url_brand, callback=self.parse_brand)  # 车牌
@@ -24,10 +28,12 @@ class UsedCarSpider(scrapy.Spider):
                 brand = brand_same_word.css('a::text').extract()[0]
                 brand_url = brand_same_word.xpath('a').xpath('@href').extract()[0]
                 brands[brand] = brand_url
-        # brands = {"阿斯顿·马丁": "/astonmartin/"} example
-        for key, value in brands.items():
-            url_cars_pages = "http://www.taoche.com" + value
-            yield Request(url=url_cars_pages, meta={"brand": key, "brand_url": value}, callback=self.parse_pages)  # 车牌
+        # brands = {"阿斯顿·马丁": "/astonmartin/"}
+        # for key, value in brands.items():
+        key = self.brandChoose
+        value = brands[key]
+        url_cars_pages = "http://www.taoche.com" + value
+        yield Request(url=url_cars_pages, meta={"brand": key, "brand_url": value}, callback=self.parse_pages)  # 车牌
 
     def parse_pages(self, response):
         self.log('A response from %s just arrived!' % response.url)
